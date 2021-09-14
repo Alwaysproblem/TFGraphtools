@@ -1,0 +1,16 @@
+modelURL:
+  needfix: 
+    - name: "orgin/ipu_query_gen9/export"
+    - tag: "serve"
+  standard:
+    - name: "orgin/ipu_query_gen9/export"
+    - tag: "serve"
+
+outputNode:
+  - 'bert/final_ids:0'
+  - 'bert/final_scores:0'
+  - 'TensorDict/StandardKvParser:0'
+  # - 'bert/mlm/predictions/BiasAdd:0'
+
+CheckOutputConfig:
+  - threshold: 1e-7
