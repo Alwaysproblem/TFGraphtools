@@ -1,0 +1,1 @@
+url = "https://docs.graphcore.ai/projects/tensorflow1-user-guide/en/latest/supported_ops.html"
