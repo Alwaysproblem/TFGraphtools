@@ -69,8 +69,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser("the kvparser data extraction")
     parser.add_argument("-m", "--model", dest="model_path", required=True, type=str, action='store')
     parser.add_argument("-bs", "--batch-size", dest="batch_size", type=int, default=1, action='store')
-    parser.add_argument("-kidx", "--kvparser-idx", dest="kvparser_idx", type=int, default=1, action='store',
-                        help="the wanted output index of kvparser", default=[0], type=int, nargs='+')
+    parser.add_argument("-kidx", "--kvparser-idx", dest="kvparser_idx", type=int, action='store',
+                        help="the wanted output index of kvparser", default=[0], nargs='+')
 
     args = parser.parse_args()
-    standard_output = run_model(args.model_path, tag="serve", bs=args.batch_size, kvparser_idx=args.kvparser)
+    standard_output = run_model(args.model_path, tag="serve", bs=args.batch_size, kvparser_idx=args.kvparser_idx)

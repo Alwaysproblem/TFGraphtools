@@ -37,9 +37,9 @@ def gen_data(bs, graph):
     data = np.load("raw_data_wo_kv_load.npz")
     feed_dict = {}
 
-    for key, value in data:
+    for key, value in data.items():
         idx = key.split('_')[2]
-        v = np.tile(v, tuple([bs] + [1]* (len(value.shape) - 1)))[:bs]
+        v = np.tile(value, tuple([bs] + [1]* (len(value.shape) - 1)))[:bs]
         feed_dict[graph.get_tensor_by_name(f"TensorDict/StandardKvParser_{idx}:0")] = v
 
     return feed_dict
@@ -59,8 +59,6 @@ def run_tput(model_path, bs=1, pipline_stages=PIPELINE_STAGE, iterations=NUM_ITE
     sess_cfg.graph_options.rewrite_options.memory_optimization = (
     rewriter_config_pb2.RewriterConfig.OFF
     )
-
-    test_results = []
 
     q = Queue()
 
@@ -111,15 +109,17 @@ def run_tput(model_path, bs=1, pipline_stages=PIPELINE_STAGE, iterations=NUM_ITE
         # tput = bs * pipline_stages / latency
         tput = bs * pipline_stages * iterations / (max_stop - min_start)
 
-        test_results.append([bs, latency, tput])
+        # test_results.append([bs, latency, tput])
 
-    bs, latency, tput = test_results
+    # bs, latency, tput = test_results[0]
 
-    print(f"batch size: {bs}, latency: {latency}, throughput: {tput}, "
-          f"mid: {mid_latency}, "
-          f"P75: {P75_latency}, "
-          f"P90: {P90_latency}, "
-          f"P99: {P99_latency}, "
+    print(f"batch size: {bs}\n"
+          f"latency: {latency}\n"
+          f"throughput: {tput}\n"
+          f"mid: {mid_latency}\n"
+          f"P75: {P75_latency}\n"
+          f"P90: {P90_latency}\n"
+          f"P99: {P99_latency}\n"
           f"mode: {mode_latency}")
 
 if __name__ == "__main__":
