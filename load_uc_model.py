@@ -12,7 +12,7 @@ from collections import defaultdict
 # from tensorflow.python.ipu.ops import application_compile_op
 # import yaml
 
-os.environ['TF_POPLAR_FLAGS'] = '--max_compilation_threads=40 --executable_cache_path=cachedir --show_progress_bar=true'
+# os.environ['TF_POPLAR_FLAGS'] = '--max_compilation_threads=40 --executable_cache_path=cachedir --show_progress_bar=true'
 # os.environ['TF_POPLAR_FLAGS'] = '--max_compilation_threads=40 --executable_cache_path=/tmp/cachedir/ --show_progress_bar=true --use_ipu_model'
 
 from tensorflow.python import ipu

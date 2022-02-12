@@ -19,6 +19,27 @@ np.random.seed(1991)
 PIPELINE_STAGE = 2
 NUM_ITER = 100
 
+input_table = {
+    "LookupPkOp:0": ((425,), np.int32),
+    "all_clk_seq_1/st:0": ((512, 1), np.float32),
+    "all_clk_seq_1/time:0": ((512, 1), np.float32),
+    # "batch_fill_attributes_for_gul_rank_item_feature:0": ((425,), np.int32),
+    # "batch_fill_attributes_for_gul_rank_item_feature_1:0": ((425,), np.int32),
+    "Unique:1": ((425,), np.int32),
+    "embedding/item_cate_id_d_shared_embedding_2:0": ((425, 32), np.float32),
+    "embedding/item_id_d_shared_embedding_2:0": ((425, 64), np.float32),
+    "embedding/item_seller_id_d_shared_embedding_2:0": ((425, 32), np.float32),
+    "embedding/ui_page_shared_embedding:0": ((1, 8), np.float32),
+    "input_from_feature_columns/concat:0": ((1, 592), np.float32),
+    "input_from_feature_columns/concat_1:0": ((425, 824), np.float32),
+    "input_from_feature_columns/concat_3:0": ((1, 1), np.float32),
+    "input_from_feature_columns/concat_4:0": ((425, 288), np.float32),
+    "input_from_feature_columns/concat_5:0": ((1, 1), np.float32),
+    "input_from_feature_columns/concat_7:0": ((178, 1), np.float32),
+    "seq_input_from_feature_columns/concat:0": ((1, 48, 324), np.float32),
+    "seq_input_from_feature_columns/concat_1:0": ((1, 512, 144), np.float32),
+    "seq_input_from_feature_columns/concat_2:0": ((178, 48, 136), np.float32),
+}
 
 def load_tf_graph(frozen_graph_filename, with_meta_graph = True,
                    tag = tf.saved_model.tag_constants.SERVING):
@@ -34,14 +55,8 @@ def load_tf_graph(frozen_graph_filename, with_meta_graph = True,
             return graph, meta_graph
 
 def gen_data(bs, graph):
-    data = np.load("raw_data_wo_kv_load.npz")
-    feed_dict = {}
-
-    for key, value in data.items():
-        idx = int(key.split('_')[2])
-        v = np.tile(value, tuple([bs] + [1]* (len(value.shape) - 1)))[:bs]
-        feed_dict[graph.get_tensor_by_name(f"TensorDict/StandardKvParser_{idx}:0" if idx !=0 else "TensorDict/StandardKvParser:0")] = v
-
+    data_dict = np.load("data.npz")
+    feed_dict = { graph.get_tensor_by_name(i if i != "Unique:1" else "Unique:0"): data_dict[i] for i in input_table }
     return feed_dict
 
 def run_tput(model_path, bs=1, pipline_stages=PIPELINE_STAGE, iterations=NUM_ITER):

@@ -13,7 +13,7 @@ from collections import defaultdict
 # from tensorflow.python.ipu.ops import application_compile_op
 # import yaml
 
-os.environ['TF_POPLAR_FLAGS'] = '--max_compilation_threads=40 --show_progress_bar=true --use_ipu_model'
+# os.environ['TF_POPLAR_FLAGS'] = '--max_compilation_threads=40 --show_progress_bar=true --use_ipu_model'
 
 from tensorflow.python import ipu
 from tensorflow.compiler.plugin.poplar.driver import config_pb2
@@ -61,11 +61,6 @@ def run_model(model_path, tag = None):
         # output_op_names = [ f"TensorDict/StandardKvParser:{i}" for i in range(4) ]
         input_op_names = [ i.name for i in meta.signature_def["serving_default"].inputs.values()]
         # print(input_op_names)
-        input_op_names.remove("all_clk_seq_1/st:0")
-        input_op_names.remove("all_clk_seq_1/time:0")
-        input_op_names.remove("batch_fill_attributes_for_gul_rank_item_feature:0")
-        input_op_names.remove("batch_fill_attributes_for_gul_rank_item_feature_1:0")
-        input_op_names.remove("LookupPkOp:0")
         output_op_names = [ i.name for i in meta.signature_def["serving_default"].outputs.values()]
         input_names_pl = [ sess.graph.get_tensor_by_name(o_name) for o_name in input_op_names]
         out_names_pl = [ sess.graph.get_tensor_by_name(o_name) for o_name in output_op_names]
@@ -76,35 +71,6 @@ def run_model(model_path, tag = None):
             it: np.random.randint(low=0, high=100, size=ishape).astype(TF_2_NP[idtype])
             for it, ishape, idtype in inputs_name_shape_dtype
         }
-        feed_dict.update({
-            sess.graph.get_tensor_by_name('all_clk_seq_1/st:0'): np.random.randint(
-                low=0, high=100, size=[512 * bs, 1]).astype(TF_2_NP[tf.float32])})
-        feed_dict.update({
-            sess.graph.get_tensor_by_name('all_clk_seq_1/time:0'): np.random.randint(
-                low=0, high=100, size=[512 * bs, 1]).astype(TF_2_NP[tf.float32])})
-        feed_dict.update({
-            sess.graph.get_tensor_by_name(
-                "batch_fill_attributes_for_gul_rank_item_feature:0"): 
-                np.ones((bs,)).astype(TF_2_NP[tf.int32])})
-        feed_dict.update({
-            sess.graph.get_tensor_by_name(
-                "batch_fill_attributes_for_gul_rank_item_feature_1:0"): 
-                (np.ones((bs,)) * 3).astype(TF_2_NP[tf.int32])})
-        feed_dict.update({
-            sess.graph.get_tensor_by_name('LookupPkOp:0'): np.random.randint(
-                low=0, high=100, size=[1]).astype(TF_2_NP[tf.int32])})
-
-        # o = sess.run([
-        #     out_names_pl,
-        #     sess.graph.get_tensor_by_name('Bitcast:0'),
-        #     sess.graph.get_tensor_by_name('Unique:0'),
-        #     sess.graph.get_tensor_by_name('Unique:1')], feed_dict=feed_dict)
-
-        # out, Bitcast, unique_0, unique_1= o
-        # print(f"output:{out}")
-        # print(f"Bitcast:{Bitcast}")
-        # print(f"unique_0:{unique_0}")
-        # print(f"unique_1:{unique_1}")
 
         for _ in range(10):
             with pvti.Tracepoint(channel, "session.run"):
