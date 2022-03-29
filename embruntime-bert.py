@@ -1,6 +1,6 @@
 import tensorflow.compat.v1 as tf
 from tensorflow.python.ipu import (ipu_compiler, ipu_infeed_queue, ipu_outfeed_queue, loops)
-from tensorflow.python.ipu.utils import (create_ipu_config, set_ipu_model_options, auto_select_ipus, configure_ipu_system)
+# from tensorflow.python.ipu.utils import (create_ipu_config, set_ipu_model_options, auto_select_ipus, configure_ipu_system)
 import numpy as np
 import os
 import shutil
@@ -16,9 +16,9 @@ from tensorflow.python.data.ops.dataset_ops import Dataset
 
 tf.disable_v2_behavior()
 
-config = create_ipu_config(profiling=True, use_poplar_text_report=False)
-config = auto_select_ipus(config, 1)
-configure_ipu_system(config=config)
+cfg = ipu.config.IPUConfig()
+cfg.auto_select_ipus = 1
+cfg.configure_ipu_system()
 
 batch_size = 1
 max_sequence_length = 32
