@@ -3,7 +3,7 @@ from tfv1perf import Evaluator
 import pandas as pd
 import argparse
 
-pd.set_option("display.max_columns", 20)
+pd.set_option("display.max_columns", 0)
 
 
 class TFv1Evaluator(Evaluator):
