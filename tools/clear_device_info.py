@@ -29,15 +29,15 @@ def clear_devices(model_path,
 if __name__ == '__main__':
   parser = argparse.ArgumentParser("Comparison the model output")
   parser.add_argument("--dir",
-                      dest="model_path",
-                      default="saved_model_path",
+                      dest="saved_model_path",
+                      default="original_model",
                       type=str)
   parser.add_argument("-o",
                       "--output-dir",
                       dest="output_dir",
                       default="ipu_model",
                       type=str)
-  parser.add_argument("-o", "--tag", dest="tag", default="serve", type=str)
+  parser.add_argument("-t", "--tag", dest="tag", default="serve", type=str)
 
   args = parser.parse_args()
   clear_devices(args.saved_model_path, args.output_dir, tag=args.tag)
