@@ -1,2 +1,2 @@
 # TFGraphtools
-some useful tools for tensorflow graph conversion
+some useful toolsets for tensorflow graph conversion
