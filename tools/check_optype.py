@@ -20,15 +20,16 @@ def freeze_saved_model(saved_model_path, output_dir, tag=tf.saved_model.tag_cons
       input_graph_def=sess.graph_def,
       output_node_names=output_node_names
     )
-  with tf.Graph().as_default():
-    tf.import_graph_def(output_graph_def, name="")
-    # We don't use any specific converter here.
-    with tf.Session() as sess:
-      saved_model_builder.add_meta_graph_and_variables(
-        sess,
-        [tag] if tag else [],
-        signature_def_map=meta_graph.signature_def)
-    saved_model_builder.save()
+  print(set(n.op for n in output_graph_def.node))
+  # with tf.Graph().as_default():
+  #   tf.import_graph_def(output_graph_def, name="")
+  #   # We don't use any specific converter here.
+  #   with tf.Session() as sess:
+  #     saved_model_builder.add_meta_graph_and_variables(
+  #       sess,
+  #       [tag] if tag else [],
+  #       signature_def_map=meta_graph.signature_def)
+  #   saved_model_builder.save()
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser("Comparison the model output")
