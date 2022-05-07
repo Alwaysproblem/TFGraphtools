@@ -20,7 +20,6 @@ def ipu_cfg(model_path):
 
 
 def prepare_raw_data(summary_dir: str,
-                     input_pl_names: list,
                      batch_size=1,
                      repeat_cnt=1,
                      device="cpu"):
@@ -30,14 +29,14 @@ def prepare_raw_data(summary_dir: str,
   ipu_indata = dict(
       np.load(os.path.join(summary_dir, "ipu_indata_worse_case.npz"),
               allow_pickle=True))["arr_0"].tolist()
-  
 
   if device == "ipu":
-    return
-  
-  return
+    return ipu_indata
 
-def run_model_raw_data(model_path, output_pl_names=None, bs=1):
+  return cpu_indata
+
+
+def run_model_raw_data(model_path, output_pl_names=None, bs=1, summary_dir=None, device="cpu"):
   with tf.Session(graph=tf.Graph()) as sess:
     meta = tf.saved_model.loader.load(sess, ["serve"], model_path)
     if not output_pl_names:
@@ -48,10 +47,10 @@ def run_model_raw_data(model_path, output_pl_names=None, bs=1):
     output_pl = [
         sess.graph.get_tensor_by_name(plname) for plname in output_pl_names
     ]
-    data = prepare_raw_data(f"{model_path}/raw_data.dat",
-                            ['TensorDict/batch:0'],
+    data = prepare_raw_data(summary_dir,
                             batch_size=bs,
-                            repeat_cnt=bs)
+                            repeat_cnt=bs,
+                            device=device)
     out = []
     for fd in data:
       o = sess.run(output_pl, feed_dict=fd)
@@ -68,6 +67,11 @@ def check_same(s, f, threshold=0.01):
     return i == j
 
   return list(map(lambda x, y: np.all(equals(x, y)), s, f))
+
+
+def print_to_file(o, device='cpu'):
+  with open(f"{device}_out.txt", "w") as f:
+    print(o, file=f)
 
 
 if __name__ == "__main__":
@@ -102,9 +106,14 @@ if __name__ == "__main__":
   args = parser.parse_args()
   cpu_o = run_model_raw_data(args.cpu_model_path,
                              args.output_tensors_names,
-                             bs=args.batch_size)
+                             bs=args.batch_size,
+                             summary_dir=args.workflow_summary_dir)
+  print_to_file(cpu_o, device='cpu')
   ipu_cfg(args.ipu_model_path)
   ipu_o = run_model_raw_data(args.ipu_model_path,
                              args.output_tensors_names,
-                             bs=args.batch_size)
+                             bs=args.batch_size,
+                             summary_dir=args.workflow_summary_dir,
+                             device="ipu")
+  print_to_file(ipu_o, device='ipu')
   print(f"the check same: {check_same(cpu_o, ipu_o, 0.01)}")
