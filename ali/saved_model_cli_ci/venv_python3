@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# source /opt/rh/devtoolset-7/enable
+# source /home/scotty/sdk/poplar-centos_7_6-2.3.0+1476-0537c534d3/enable.sh
+# source /home/scotty/Desktop/ipu_tool_env/bin/activate
+source ~/.bashrc
+
+cd /home/scotty/workflow
+python3 $@
+chown -R scotty:all /home/scotty/workflow
