@@ -102,6 +102,11 @@ if __name__ == "__main__":
                       default=None,
                       nargs='+',
                       type=str)
+  parser.add_argument("-th",
+                      "--threshold",
+                      dest="threshold",
+                      default=0.01,
+                      type=float)
 
   args = parser.parse_args()
   cpu_o = run_model_raw_data(args.cpu_model_path,
@@ -116,4 +121,4 @@ if __name__ == "__main__":
                              summary_dir=args.workflow_summary_dir,
                              device="ipu")
   print_to_file(ipu_o, device='ipu')
-  print(f"the check same: {check_same(cpu_o, ipu_o, 0.01)}")
+  print(f"the check same: {check_same(cpu_o, ipu_o, args.threshold)}")

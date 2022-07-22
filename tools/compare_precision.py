@@ -101,6 +101,11 @@ if __name__ == "__main__":
                       default=None,
                       nargs='+',
                       type=str)
+  parser.add_argument("-th",
+                      "--threshold",
+                      dest="threshold",
+                      default=0.01,
+                      type=float)
 
   args = parser.parse_args()
   cpu_o = run_model_raw_data(args.cpu_model_path,
@@ -110,4 +115,4 @@ if __name__ == "__main__":
   ipu_o = run_model_raw_data(args.ipu_model_path,
                              args.output_tensors_names,
                              bs=args.batch_size)
-  print(f"the check same: {check_same(cpu_o, ipu_o, 0.01)}")
+  print(f"the check same: {check_same(cpu_o, ipu_o, args.threshold)}")
